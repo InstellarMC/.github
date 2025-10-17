@@ -1,0 +1,49 @@
+name: Validate Renovate configuration
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Renovate configuration file
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      matrix:
+        file:
+          - default
+          - .github/renovate
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
+        with:
+          show-progress: false
+
+      - name: Validate ${{ matrix.file }}
+        uses: rinchsan/renovate-config-validator@a12a2b98cd4db923c33d1ce407c57afb43f3ff59 # v0.2.0
+        with:
+          pattern: '${{ matrix.file }}.json'
+
+  validate-success:
+    runs-on: ubuntu-latest
+    needs: validate
+    timeout-minutes: 1
+    if: always()
+    steps:
+      - name: Fail for failed or cancelled presets
+        if: |
+          needs.validate.result == 'failure' ||
+          needs.validate.result == 'cancelled'
+        run: exit 1

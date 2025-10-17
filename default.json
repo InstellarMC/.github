@@ -1,0 +1,69 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Default preset for use within InstellarMC projects",
+  "extends": [
+    "config:recommended",
+    ":maintainLockFilesWeekly",
+    ":rebaseStalePrs",
+    ":automergeDigest",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)",
+    ":timezone(Asia/Seoul)",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "automergeType": "branch",
+  "commitBodyTable": true,
+  "configMigration": true,
+  "dependencyDashboard": true,
+  "prCreation": "not-pending",
+  "rebaseWhen": "behind-base-branch",
+  "platformAutomerge": true,
+  "packageRules": [
+    {
+      "description": "Pin digests for dockerfile and docker-compose managers",
+      "matchManagers": [
+        "dockerfile",
+        "docker-compose"
+      ],
+      "matchDatasources": [
+        "docker"
+      ],
+      "pinDigests": true
+    },
+    {
+      "description": "Group linter minor and patch updates",
+      "extends": [
+        "packages:linters"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "linters"
+    },
+    {
+      "description": "Require dashboard approval for major updates",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Automerge non-major updates",
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "lockFileMaintenance"
+      ],
+      "automerge": true
+    },
+    {
+      "description": "One week stability period for npm packages",
+      "matchDatasources": [
+        "npm"
+      ],
+      "minimumReleaseAge": "7 days"
+    }
+  ]
+}
